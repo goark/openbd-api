@@ -181,6 +181,25 @@ func (book *Book) String() string {
 	return ""
 }
 
+//Valid returns true if Book is valid data
+func (book *Book) Valid() bool {
+	if book == nil {
+		return false
+	}
+	if len(book.Onix.RecordReference) == 0 {
+		return false
+	}
+	return true
+}
+
+//Id returns id code (= Book.Onix.RecordReference)
+func (book *Book) Id() string {
+	if book == nil {
+		return ""
+	}
+	return book.Onix.RecordReference
+}
+
 //DecodeBook returns Book instance from byte buffer
 func DecodeBook(b []byte) (*Book, error) {
 	book := Book{}
@@ -192,7 +211,7 @@ func DecodeBook(b []byte) (*Book, error) {
 
 //DecodeBooks returns array of Book instance from byte buffer
 func DecodeBooks(b []byte) ([]Book, error) {
-	books := []Book{}
+	var books []Book
 	if err := json.NewDecoder(bytes.NewReader(b)).Decode(&books); err != nil {
 		return books, errs.Wrap(err, "error in DecodeBooks() function")
 	}
