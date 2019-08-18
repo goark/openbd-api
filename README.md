@@ -12,13 +12,13 @@
 import "github.com/spiegel-im-spiegel/openbd-api"
 ```
 
-### Lookup Aozora-bunko Book Data
+### Lookup openBD Book Data
 
 ```
 books, err := openbd.DefaultClient().LookupBook([]string{"9784797369915", "9784274069321"})
 ```
 
-## Entities for Aozora-bunko
+## Entities for openBD
 
 ### Book type
 
@@ -204,10 +204,10 @@ type Summary struct {
 $ go get github.com/spiegel-im-spiegel/openbd-api/cli/openbd
 ```
 
-### Lookup Aozora-bunko Bookq Data
+### Lookup openBD Books Data
 
 ```
-$ aozora-bunko lookup 9784797369915 9784274069321
+$ openbd lookup 9784797369915 9784274069321
 ```
 
 [openbd-api]: https://github.com/spiegel-im-spiegel/openbd-api "spiegel-im-spiegel/openbd-api: APIs for openBD by Golang"
