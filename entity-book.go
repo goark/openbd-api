@@ -3,6 +3,7 @@ package openbd
 import (
 	"bytes"
 	"encoding/json"
+	"time"
 
 	"github.com/spiegel-im-spiegel/errs"
 )
@@ -31,9 +32,14 @@ type Onix struct {
 			MeasureUnitCode string
 		} `json:",omitempty"`
 		Collection struct {
-			CollectionType string
-			TitleDetail    struct {
-				TitleType    string
+			CollectionType     string
+			CollectionSequence struct {
+				CollectionSequenceType     string `json:",omitempty"`
+				CollectionSequenceTypeName string `json:",omitempty"`
+				CollectionSequenceNumber   string `json:",omitempty"`
+			} `json:",omitempty"`
+			TitleDetail struct {
+				TitleType    string `json:",omitempty"`
 				TitleElement []struct {
 					TitleElementLevel string
 					TitleText         struct {
@@ -181,23 +187,165 @@ func (book *Book) String() string {
 	return ""
 }
 
-//Valid returns true if Book is valid data
-func (book *Book) Valid() bool {
-	if book == nil {
-		return false
-	}
-	if len(book.Onix.RecordReference) == 0 {
-		return false
-	}
-	return true
-}
-
 //Id returns id code (= Book.Onix.RecordReference)
 func (book *Book) Id() string {
 	if book == nil {
 		return ""
 	}
 	return book.Onix.RecordReference
+}
+
+//Valid returns true if Book is valid data
+func (book *Book) Valid() bool {
+	return len(book.Id()) > 0
+}
+
+//ISBN returns ISBN code
+func (book *Book) ISBN() string {
+	if !book.Valid() {
+		return ""
+	}
+	if len(book.Onix.ProductIdentifier.IDValue) > 0 {
+		return book.Onix.ProductIdentifier.IDValue
+	}
+	if len(book.Summary.ISBN) > 0 {
+		return book.Summary.ISBN
+	}
+	return book.Onix.RecordReference
+}
+
+//Title returns string of Book Title
+func (book *Book) Title() string {
+	if !book.Valid() {
+		return ""
+	}
+	title := ""
+	if len(book.Onix.DescriptiveDetail.TitleDetail.TitleType) > 0 {
+		title = book.Onix.DescriptiveDetail.TitleDetail.TitleElement.TitleText.Content
+	}
+	if len(title) == 0 {
+		title = book.Summary.Title
+	}
+	return title
+}
+
+//SubTitle returns string of sub-title
+func (book *Book) SubTitle() string {
+	if !book.Valid() {
+		return ""
+	}
+	//TODO: Subtitle
+	return ""
+}
+
+//SeriesTitle returns string of series title
+func (book *Book) SeriesTitle() string {
+	if !book.Valid() {
+		return ""
+	}
+	for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
+		if elm.TitleElementLevel == "01" && len(elm.TitleText.Content) > 0 {
+			return elm.TitleText.Content
+		}
+	}
+	return book.Summary.Series
+}
+
+//Label returns string of book label
+func (book *Book) Label() string {
+	if !book.Valid() {
+		return ""
+	}
+	for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
+		if elm.TitleElementLevel == "02" && len(elm.TitleText.Content) > 0 {
+			return elm.TitleText.Content
+		}
+	}
+	return ""
+}
+
+//ImageURL returns string of book cover image URL
+func (book *Book) ImageURL() string {
+	if !book.Valid() {
+		return ""
+	}
+	for _, elm := range book.Onix.CollateralDetail.SupportingResource {
+		if elm.ResourceContentType == "01" {
+			for _, v := range elm.ResourceVersion {
+				if v.ResourceForm == "02" && len(v.ResourceLink) > 0 {
+					return v.ResourceLink
+				}
+			}
+		}
+	}
+	return book.Summary.Cover
+}
+
+//Authors returns strings of Contributors
+func (book *Book) Authors() []string {
+	authors := []string{}
+	if !book.Valid() {
+		return authors
+	}
+	for _, elm := range book.Onix.DescriptiveDetail.Contributor {
+		if len(elm.PersonName.Content) > 0 {
+			authors = append(authors, elm.PersonName.Content)
+		}
+	}
+	if len(authors) > 0 {
+		return authors
+	}
+	return []string{book.Summary.Author}
+}
+
+//Publisher returns strings of Publisher
+func (book *Book) Publisher() string {
+	if !book.Valid() {
+		return ""
+	}
+	pub := book.Onix.PublishingDetail.Imprint.ImprintName
+	if len(pub) == 0 {
+		pub = book.Onix.PublishingDetail.Publisher.PublisherName
+	}
+	if len(pub) == 0 {
+		pub = book.Summary.Publisher
+	}
+	return pub
+}
+
+//PublicationDate returns Date of Publication
+func (book *Book) PublicationDate() Date {
+	if !book.Valid() {
+		return NewDate(time.Time{})
+	}
+	for _, pubdate := range book.Onix.PublishingDetail.PublishingDate {
+		if pubdate.PublishingDateRole == "01" && !pubdate.Date.IsZero() {
+			return pubdate.Date
+		}
+	}
+	if !book.Hanmoto.DatePublished.IsZero() {
+		return book.Hanmoto.DatePublished
+	}
+	return book.Summary.PubDate
+}
+
+//Description returns strings of book description or table of content
+func (book *Book) Description() string {
+	if !book.Valid() {
+		return ""
+	}
+	desc := ""
+	for _, content := range book.Onix.CollateralDetail.TextContent {
+		switch content.TextType {
+		case "02", "04": //brief or table of content
+			if len(desc) == 0 {
+				desc = content.Text
+			}
+		case "03": //description
+			desc = content.Text
+		}
+	}
+	return desc
 }
 
 //DecodeBook returns Book instance from byte buffer
