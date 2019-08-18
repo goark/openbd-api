@@ -198,7 +198,7 @@ type Summary struct {
 
 ## Command Line Interface (Sample Code)
 
-### Install and Build
+### Download and Build
 
 ```
 $ go get github.com/spiegel-im-spiegel/openbd-api/cli/openbd
