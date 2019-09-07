@@ -48,12 +48,12 @@ type Onix struct {
         } `json:",omitempty"`
         Collection struct {
             CollectionType     string
-            CollectionSequence struct {
+            CollectionSequence *struct {
                 CollectionSequenceType     string `json:",omitempty"`
                 CollectionSequenceTypeName string `json:",omitempty"`
                 CollectionSequenceNumber   string `json:",omitempty"`
             } `json:",omitempty"`
-            TitleDetail struct {
+            TitleDetail *struct {
                 TitleType    string `json:",omitempty"`
                 TitleElement []struct {
                     TitleElementLevel string
@@ -62,7 +62,7 @@ type Onix struct {
                         CollationKey string `json:"collationkey,omitempty"`
                     }
                 } `json:",omitempty"`
-            }
+            } `json:",omitempty"`
         }
         TitleDetail struct {
             TitleType    string
@@ -103,7 +103,7 @@ type Onix struct {
             AudienceCodeValue string
         } `json:",omitempty"`
     }
-    CollateralDetail struct {
+    CollateralDetail *struct {
         TextContent []struct {
             TextType        string
             ContentAudience string
@@ -122,7 +122,7 @@ type Onix struct {
                 ResourceLink string
             } `json:",omitempty"`
         } `json:",omitempty"`
-    }
+    } `json:",omitempty"`
     PublishingDetail struct {
         Imprint struct {
             ImprintIdentifier []struct {

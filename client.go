@@ -1,6 +1,7 @@
 package openbd
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,22 +19,25 @@ const (
 type Client struct {
 	server *Server
 	client *http.Client
+	ctx    context.Context
 }
 
 //LookupBooksRaw gets books data (raw data)
 func (c *Client) LookupBooksRaw(ids []string) ([]byte, error) {
 	params := url.Values{}
 	params.Set("isbn", strings.Join(ids, ","))
-	return c.get(c.MakeLookupCommand(params))
+	b, err := c.get(c.MakeLookupCommand(params))
+	return b, errs.Wrap(err, "")
 }
 
 //LookupBooks gets books data (struct data)
 func (c *Client) LookupBooks(ids []string) ([]Book, error) {
 	b, err := c.LookupBooksRaw(ids)
 	if err != nil {
-		return nil, errs.Wrapf(err, "error in Client.LookupBooks() function")
+		return nil, errs.Wrap(err, "")
 	}
-	return DecodeBooks(b)
+	books, err := DecodeBooks(b)
+	return books, errs.Wrap(err, "")
 }
 
 //MakeLookupCommand returns URI for lookup command
@@ -45,18 +49,22 @@ func (c *Client) MakeLookupCommand(v url.Values) *url.URL {
 }
 
 func (c *Client) get(u *url.URL) ([]byte, error) {
-	resp, err := c.client.Get(u.String())
+	req, err := http.NewRequestWithContext(c.ctx, "GET", u.String(), nil)
 	if err != nil {
-		return nil, errs.Wrapf(err, "error in Client.get(%v) function", u)
+		return nil, errs.Wrap(err, "", errs.WithParam("url", u.String()))
+	}
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, errs.Wrap(err, "", errs.WithParam("url", u.String()))
 	}
 	defer resp.Body.Close()
 
 	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		return nil, errs.Wrapf(ErrHTTPStatus, "%v (in %v)", resp.Status, u)
+		return nil, errs.Wrap(ErrHTTPStatus, "", errs.WithParam("url", u.String()), errs.WithParam("status", resp.Status))
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, errs.Wrapf(err, "error in Client.get(%v) function", u)
+		return body, errs.Wrap(err, "", errs.WithParam("url", u.String()))
 	}
 	return body, nil
 }

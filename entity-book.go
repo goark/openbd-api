@@ -33,12 +33,12 @@ type Onix struct {
 		} `json:",omitempty"`
 		Collection struct {
 			CollectionType     string
-			CollectionSequence struct {
+			CollectionSequence *struct {
 				CollectionSequenceType     string `json:",omitempty"`
 				CollectionSequenceTypeName string `json:",omitempty"`
 				CollectionSequenceNumber   string `json:",omitempty"`
 			} `json:",omitempty"`
-			TitleDetail struct {
+			TitleDetail *struct {
 				TitleType    string `json:",omitempty"`
 				TitleElement []struct {
 					TitleElementLevel string
@@ -47,7 +47,7 @@ type Onix struct {
 						CollationKey string `json:"collationkey,omitempty"`
 					}
 				} `json:",omitempty"`
-			}
+			} `json:",omitempty"`
 		}
 		TitleDetail struct {
 			TitleType    string
@@ -88,7 +88,7 @@ type Onix struct {
 			AudienceCodeValue string
 		} `json:",omitempty"`
 	}
-	CollateralDetail struct {
+	CollateralDetail *struct {
 		TextContent []struct {
 			TextType        string
 			ContentAudience string
@@ -107,7 +107,7 @@ type Onix struct {
 				ResourceLink string
 			} `json:",omitempty"`
 		} `json:",omitempty"`
-	}
+	} `json:",omitempty"`
 	PublishingDetail struct {
 		Imprint struct {
 			ImprintIdentifier []struct {
@@ -243,9 +243,11 @@ func (book *Book) SeriesTitle() string {
 	if !book.Valid() {
 		return ""
 	}
-	for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
-		if elm.TitleElementLevel == "01" && len(elm.TitleText.Content) > 0 {
-			return elm.TitleText.Content
+	if book.Onix.DescriptiveDetail.Collection.TitleDetail != nil {
+		for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
+			if elm.TitleElementLevel == "01" && len(elm.TitleText.Content) > 0 {
+				return elm.TitleText.Content
+			}
 		}
 	}
 	return book.Summary.Series
@@ -256,9 +258,11 @@ func (book *Book) Label() string {
 	if !book.Valid() {
 		return ""
 	}
-	for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
-		if elm.TitleElementLevel == "02" && len(elm.TitleText.Content) > 0 {
-			return elm.TitleText.Content
+	if book.Onix.DescriptiveDetail.Collection.TitleDetail != nil {
+		for _, elm := range book.Onix.DescriptiveDetail.Collection.TitleDetail.TitleElement {
+			if elm.TitleElementLevel == "02" && len(elm.TitleText.Content) > 0 {
+				return elm.TitleText.Content
+			}
 		}
 	}
 	return ""
@@ -269,11 +273,13 @@ func (book *Book) ImageURL() string {
 	if !book.Valid() {
 		return ""
 	}
-	for _, elm := range book.Onix.CollateralDetail.SupportingResource {
-		if elm.ResourceContentType == "01" {
-			for _, v := range elm.ResourceVersion {
-				if v.ResourceForm == "02" && len(v.ResourceLink) > 0 {
-					return v.ResourceLink
+	if book.Onix.CollateralDetail != nil {
+		for _, elm := range book.Onix.CollateralDetail.SupportingResource {
+			if elm.ResourceContentType == "01" {
+				for _, v := range elm.ResourceVersion {
+					if v.ResourceForm == "02" && len(v.ResourceLink) > 0 {
+						return v.ResourceLink
+					}
 				}
 			}
 		}
@@ -335,14 +341,16 @@ func (book *Book) Description() string {
 		return ""
 	}
 	desc := ""
-	for _, content := range book.Onix.CollateralDetail.TextContent {
-		switch content.TextType {
-		case "02", "04": //brief or table of content
-			if len(desc) == 0 {
+	if book.Onix.CollateralDetail != nil {
+		for _, content := range book.Onix.CollateralDetail.TextContent {
+			switch content.TextType {
+			case "02", "04": //brief or table of content
+				if len(desc) == 0 {
+					desc = content.Text
+				}
+			case "03": //description
 				desc = content.Text
 			}
-		case "03": //description
-			desc = content.Text
 		}
 	}
 	return desc
