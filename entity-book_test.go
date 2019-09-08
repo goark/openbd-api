@@ -127,8 +127,8 @@ func TestBooks(t *testing.T) {
 			continue
 		}
 		for i, bk := range bks {
-			if bk.Valid() != tc.valid[i] {
-				t.Errorf("Book[%d] is %v, want %v", i, bk.Valid(), tc.valid[i])
+			if bk.IsValid() != tc.valid[i] {
+				t.Errorf("Book[%d] is %v, want %v", i, bk.IsValid(), tc.valid[i])
 				continue
 			}
 			if bk.Id() != tc.ids[i] {

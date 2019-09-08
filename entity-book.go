@@ -195,14 +195,14 @@ func (book *Book) Id() string {
 	return book.Onix.RecordReference
 }
 
-//Valid returns true if Book is valid data
-func (book *Book) Valid() bool {
+//IsValid returns true if Book is valid data
+func (book *Book) IsValid() bool {
 	return len(book.Id()) > 0
 }
 
 //ISBN returns ISBN code
 func (book *Book) ISBN() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	if len(book.Onix.ProductIdentifier.IDValue) > 0 {
@@ -216,7 +216,7 @@ func (book *Book) ISBN() string {
 
 //Title returns string of Book Title
 func (book *Book) Title() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	title := ""
@@ -231,7 +231,7 @@ func (book *Book) Title() string {
 
 //SubTitle returns string of sub-title
 func (book *Book) SubTitle() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	//TODO: Subtitle
@@ -240,7 +240,7 @@ func (book *Book) SubTitle() string {
 
 //SeriesTitle returns string of series title
 func (book *Book) SeriesTitle() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	if book.Onix.DescriptiveDetail.Collection.TitleDetail != nil {
@@ -255,7 +255,7 @@ func (book *Book) SeriesTitle() string {
 
 //Label returns string of book label
 func (book *Book) Label() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	if book.Onix.DescriptiveDetail.Collection.TitleDetail != nil {
@@ -270,7 +270,7 @@ func (book *Book) Label() string {
 
 //ImageURL returns string of book cover image URL
 func (book *Book) ImageURL() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	if book.Onix.CollateralDetail != nil {
@@ -290,7 +290,7 @@ func (book *Book) ImageURL() string {
 //Authors returns strings of Contributors
 func (book *Book) Authors() []string {
 	authors := []string{}
-	if !book.Valid() {
+	if !book.IsValid() {
 		return authors
 	}
 	for _, elm := range book.Onix.DescriptiveDetail.Contributor {
@@ -306,7 +306,7 @@ func (book *Book) Authors() []string {
 
 //Publisher returns strings of Publisher
 func (book *Book) Publisher() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	pub := book.Onix.PublishingDetail.Imprint.ImprintName
@@ -321,7 +321,7 @@ func (book *Book) Publisher() string {
 
 //PublicationDate returns Date of Publication
 func (book *Book) PublicationDate() Date {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return NewDate(time.Time{})
 	}
 	for _, pubdate := range book.Onix.PublishingDetail.PublishingDate {
@@ -337,7 +337,7 @@ func (book *Book) PublicationDate() Date {
 
 //Description returns strings of book description or table of content
 func (book *Book) Description() string {
-	if !book.Valid() {
+	if !book.IsValid() {
 		return ""
 	}
 	desc := ""
