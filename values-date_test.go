@@ -51,12 +51,18 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestUnmarshalErr(t *testing.T) {
-	data := `{"date_taken": "2005/03/26"}`
-	tst := &ForTestStruct{}
-	if err := json.Unmarshal([]byte(data), tst); err == nil {
-		t.Error("Unmarshal() error = nil, not want nil.")
-	} else {
-		fmt.Printf("Info: %+v\n", err)
+	testCases := []string{
+		`{"date_taken": "2005/03/26"}`,
+		`{"date_taken": "2005-03-26 00:00"}`,
+		`{"date_taken": "2005-03-26+0900"}`,
+	}
+	for _, tcStr := range testCases {
+		tst := &ForTestStruct{}
+		if err := json.Unmarshal([]byte(tcStr), tst); err == nil {
+			t.Error("Unmarshal() error = nil, not want nil.")
+		} else {
+			fmt.Printf("Info: %+v\n", err)
+		}
 	}
 }
 
