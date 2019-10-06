@@ -1,74 +1,11 @@
 package openbd
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
 )
-
-// func TestLookupBooksRaw(t *testing.T) {
-// 	testCases := []struct {
-// 		ids []string
-// 	}{
-// 		{ids: nil},
-// 		{ids: []string{}},
-// 		{ids: []string{"foo"}},
-// 		{ids: []string{"9784535585744"}},
-// 		{ids: []string{"9784535585744", "9784797369915"}},
-// 		{ids: []string{"9784535585744", "foo"}},
-// 		{ids: []string{"9784535585744&isbn=9784797369915"}},
-// 	}
-//
-// 	for _, tc := range testCases {
-// 		b, err := DefaultClient().LookupBooksRaw(tc.ids)
-// 		if err != nil {
-// 			t.Errorf("Client.LookupBooksRaw() is \"%v\", want nil", err)
-// 			fmt.Printf("error info: %+v\n", err)
-// 			continue
-// 		}
-// 		fmt.Printf("response: %+v\n", string(b))
-// 	}
-// }
-//
-// func TestLookupBooks(t *testing.T) {
-// 	testCases := []struct {
-// 		ids   []string
-// 		valid []bool
-// 	}{
-// 		{ids: nil, valid: []bool{false}},
-// 		{ids: []string{}, valid: []bool{false}},
-// 		{ids: []string{"foo"}, valid: []bool{false}},
-// 		{ids: []string{"9784535585744"}, valid: []bool{true}},
-// 		{ids: []string{"9784535585744", "9784797369915"}, valid: []bool{true, true}},
-// 		{ids: []string{"9784535585744", "foo"}, valid: []bool{true, false}},
-// 		{ids: []string{"9784535585744&isbn=9784797369915"}, valid: []bool{false}},
-// 	}
-//
-// 	for _, tc := range testCases {
-// 		bks, err := DefaultClient().LookupBooks(tc.ids)
-// 		if err != nil {
-// 			t.Errorf("Client.LookupBooks() is \"%v\", want nil", err)
-// 			fmt.Printf("error info: %+v\n", err)
-// 			continue
-// 		}
-// 		if len(bks) != len(tc.valid) {
-// 			t.Errorf("Count of Client.LookupBooks() is %v, want %v", len(bks), len(tc.valid))
-// 			continue
-// 		}
-// 		for i, bk := range bks {
-// 			if bk.Valid() != tc.valid[i] {
-// 				t.Errorf("Book[%d] is %v, want %v", i, bk.Valid(), tc.valid[i])
-// 				continue
-// 			}
-// 			if bk.Valid() {
-// 				id := bk.Id()
-// 				if id != tc.ids[i] {
-// 					t.Errorf("Book[%d] is %v, want %v", i, id, tc.ids[i])
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 
 func TestMakeLookupCommand(t *testing.T) {
 	testCases := []struct {
@@ -87,7 +24,7 @@ func TestMakeLookupCommand(t *testing.T) {
 		if u.String() != tc.str {
 			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
-		u = (*Server)(nil).CreateClient(nil, &http.Client{}).MakeLookupCommand(tc.v)
+		u = (*Server)(nil).CreateClient(WithContext(context.Background()), WithHttpCilent(&http.Client{})).MakeLookupCommand(tc.v)
 		if u.String() != tc.str {
 			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
