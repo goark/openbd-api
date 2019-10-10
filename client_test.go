@@ -24,7 +24,7 @@ func TestMakeLookupCommand(t *testing.T) {
 		if u.String() != tc.str {
 			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
-		u = (*Server)(nil).CreateClient(WithContext(context.Background()), WithHttpCilent(&http.Client{})).MakeLookupCommand(tc.v)
+		u = (*Server)(nil).CreateClient(WithContext(context.Background()), WithHttpClient(&http.Client{})).MakeLookupCommand(tc.v)
 		if u.String() != tc.str {
 			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
