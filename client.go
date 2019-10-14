@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	APIVersion = "v1"
+	defaultAPIVersion = "v1"
 )
 
 //Client is http.Client for Aozora API Server
@@ -26,7 +26,7 @@ type Client struct {
 func (c *Client) LookupBooksRaw(ids []string) ([]byte, error) {
 	params := url.Values{}
 	params.Set("isbn", strings.Join(ids, ","))
-	b, err := c.get(c.MakeLookupCommand(params))
+	b, err := c.get(c.makeLookupCommand(params))
 	return b, errs.Wrap(err, "")
 }
 
@@ -40,31 +40,34 @@ func (c *Client) LookupBooks(ids []string) ([]Book, error) {
 	return books, errs.Wrap(err, "")
 }
 
-//MakeLookupCommand returns URI for lookup command
-func (c *Client) MakeLookupCommand(v url.Values) *url.URL {
+func (c *Client) makeLookupCommand(v url.Values) *url.URL {
 	u := c.server.URL()
-	u.Path = fmt.Sprintf("/%v/%v", APIVersion, "get")
+	u.Path = fmt.Sprintf("/%v/%v", c.apiDir(), "get")
 	u.RawQuery = v.Encode()
 	return u
+}
+
+func (c *Client) apiDir() string {
+	return defaultAPIVersion
 }
 
 func (c *Client) get(u *url.URL) ([]byte, error) {
 	req, err := http.NewRequestWithContext(c.ctx, "GET", u.String(), nil)
 	if err != nil {
-		return nil, errs.Wrap(err, "", errs.WithParam("url", u.String()))
+		return nil, errs.Wrap(err, "", errs.WithContext("url", u.String()))
 	}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errs.Wrap(err, "", errs.WithParam("url", u.String()))
+		return nil, errs.Wrap(err, "", errs.WithContext("url", u.String()))
 	}
 	defer resp.Body.Close()
 
 	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		return nil, errs.Wrap(ErrHTTPStatus, "", errs.WithParam("url", u.String()), errs.WithParam("status", resp.Status))
+		return nil, errs.Wrap(ErrHTTPStatus, "", errs.WithContext("url", u.String()), errs.WithContext("status", resp.Status))
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, errs.Wrap(err, "", errs.WithParam("url", u.String()))
+		return body, errs.Wrap(err, "", errs.WithContext("url", u.String()))
 	}
 	return body, nil
 }

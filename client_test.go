@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestMakeLookupCommand(t *testing.T) {
+func TestmakeLookupCommand(t *testing.T) {
 	testCases := []struct {
 		v   url.Values
 		str string
@@ -20,13 +20,13 @@ func TestMakeLookupCommand(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		u := DefaultClient().MakeLookupCommand(tc.v)
+		u := DefaultClient().makeLookupCommand(tc.v)
 		if u.String() != tc.str {
-			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
+			t.Errorf("Client.makeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
-		u = (*Server)(nil).CreateClient(WithContext(context.Background()), WithHttpClient(&http.Client{})).MakeLookupCommand(tc.v)
+		u = (*Server)(nil).CreateClient(WithContext(context.Background()), WithHttpClient(&http.Client{})).makeLookupCommand(tc.v)
 		if u.String() != tc.str {
-			t.Errorf("Client.MakeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
+			t.Errorf("Client.makeLookupCommand() is \"%v\", want \"%v\"", u.String(), tc.str)
 		}
 	}
 }

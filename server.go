@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	DefaultHost = "api.openbd.jp"
+	defaultScheme = "https"
+	defaultHost   = "api.openbd.jp"
 )
 
 //Server is informations of openBD
@@ -21,7 +22,7 @@ type ServerOptFunc func(*Server)
 
 //New returns new Server instance
 func New(opts ...ServerOptFunc) *Server {
-	server := &Server{scheme: "https", name: DefaultHost}
+	server := &Server{scheme: defaultScheme, name: defaultHost}
 	for _, opt := range opts {
 		opt(server)
 	}

@@ -7,8 +7,8 @@ func TestServer(t *testing.T) {
 		s   *Server
 		str string
 	}{
-		{s: (*Server)(nil), str: "https://" + DefaultHost},
-		{s: New(), str: "https://" + DefaultHost},
+		{s: (*Server)(nil), str: defaultScheme + "://" + defaultHost},
+		{s: New(), str: defaultScheme + "://" + defaultHost},
 		{s: New(WithScheme("foo"), WithServerName("bar")), str: "foo://bar"},
 	}
 
