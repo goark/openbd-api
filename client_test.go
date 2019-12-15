@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestmakeLookupCommand(t *testing.T) {
+func TestMakeLookupCommand(t *testing.T) {
 	testCases := []struct {
 		v   url.Values
 		str string
