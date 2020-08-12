@@ -360,7 +360,7 @@ func (book *Book) Description() string {
 func DecodeBook(b []byte) (*Book, error) {
 	book := Book{}
 	if err := json.NewDecoder(bytes.NewReader(b)).Decode(&book); err != nil {
-		return &book, errs.Wrap(err, "error in DecodeBook() function")
+		return &book, errs.New("error in DecodeBook() function", errs.WithCause(err))
 	}
 	return &book, nil
 }
@@ -369,7 +369,7 @@ func DecodeBook(b []byte) (*Book, error) {
 func DecodeBooks(b []byte) ([]Book, error) {
 	var books []Book
 	if err := json.NewDecoder(bytes.NewReader(b)).Decode(&books); err != nil {
-		return books, errs.Wrap(err, "error in DecodeBooks() function")
+		return books, errs.New("error in DecodeBooks() function", errs.WithCause(err))
 	}
 	return books, nil
 }
@@ -384,7 +384,7 @@ func EncodeBooks(books []Book) ([]byte, error) {
 	return json.Marshal(books)
 }
 
-/* Copyright 2019 Spiegel
+/* Copyright 2019,2020 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

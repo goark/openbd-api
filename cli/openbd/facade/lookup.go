@@ -17,7 +17,7 @@ func newLookupCmd(ui *rwi.RWI) *cobra.Command {
 		Long:  "Lookup book data by openBD API",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
-				return errs.Wrap(os.ErrInvalid, "book id")
+				return errs.New("book id", errs.WithCause(os.ErrInvalid))
 			}
 
 			if rawFlag {
@@ -44,7 +44,7 @@ func newLookupCmd(ui *rwi.RWI) *cobra.Command {
 	return lookupCmd
 }
 
-/* Copyright 2019 Spiegel
+/* Copyright 2019,2020 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
