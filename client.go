@@ -27,17 +27,17 @@ func (c *Client) LookupBooksRaw(ids []string) ([]byte, error) {
 	params := url.Values{}
 	params.Set("isbn", strings.Join(ids, ","))
 	b, err := c.get(c.makeLookupCommand(params))
-	return b, errs.Wrap(err, "")
+	return b, errs.Wrap(err)
 }
 
 //LookupBooks gets books data (struct data)
 func (c *Client) LookupBooks(ids []string) ([]Book, error) {
 	b, err := c.LookupBooksRaw(ids)
 	if err != nil {
-		return nil, errs.Wrap(err, "")
+		return nil, errs.Wrap(err)
 	}
 	books, err := DecodeBooks(b)
-	return books, errs.Wrap(err, "")
+	return books, errs.Wrap(err)
 }
 
 func (c *Client) makeLookupCommand(v url.Values) *url.URL {
@@ -54,20 +54,20 @@ func (c *Client) apiDir() string {
 func (c *Client) get(u *url.URL) ([]byte, error) {
 	req, err := http.NewRequestWithContext(c.ctx, "GET", u.String(), nil)
 	if err != nil {
-		return nil, errs.Wrap(err, "", errs.WithContext("url", u.String()))
+		return nil, errs.Wrap(err, errs.WithContext("url", u.String()))
 	}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errs.Wrap(err, "", errs.WithContext("url", u.String()))
+		return nil, errs.Wrap(err, errs.WithContext("url", u.String()))
 	}
 	defer resp.Body.Close()
 
 	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
-		return nil, errs.Wrap(ErrHTTPStatus, "", errs.WithContext("url", u.String()), errs.WithContext("status", resp.Status))
+		return nil, errs.Wrap(ErrHTTPStatus, errs.WithContext("url", u.String()), errs.WithContext("status", resp.Status))
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, errs.Wrap(err, "", errs.WithContext("url", u.String()))
+		return body, errs.Wrap(err, errs.WithContext("url", u.String()))
 	}
 	return body, nil
 }
