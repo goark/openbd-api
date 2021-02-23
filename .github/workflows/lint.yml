@@ -5,6 +5,7 @@ on:
       - master
   pull_request:
 jobs:
+  golangci:
     name: lint
     runs-on: ubuntu-latest
     steps:
