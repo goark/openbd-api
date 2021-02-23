@@ -3,7 +3,7 @@ package openbd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -65,7 +65,7 @@ func (c *Client) get(u *url.URL) ([]byte, error) {
 	if !(resp.StatusCode != 0 && resp.StatusCode < http.StatusBadRequest) {
 		return nil, errs.Wrap(ErrHTTPStatus, errs.WithContext("url", u.String()), errs.WithContext("status", resp.Status))
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return body, errs.Wrap(err, errs.WithContext("url", u.String()))
 	}
