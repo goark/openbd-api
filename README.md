@@ -17,7 +17,7 @@ import "github.com/spiegel-im-spiegel/openbd-api"
 
 ### Lookup openBD Book Data
 
-```
+```go
 books, err := openbd.DefaultClient().LookupBook([]string{"9784797369915", "9784274069321"})
 ```
 
@@ -25,7 +25,7 @@ books, err := openbd.DefaultClient().LookupBook([]string{"9784797369915", "97842
 
 ### Book type
 
-```
+```go
 //Book is entity class of book info.
 type Book struct {
     Onix    Onix    `json:"onix"`

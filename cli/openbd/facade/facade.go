@@ -1,7 +1,10 @@
 package facade
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
 	"runtime"
 
 	"github.com/spf13/cobra"
@@ -70,13 +73,15 @@ func Execute(ui *rwi.RWI, args []string) (exit exitcode.ExitCode) {
 
 	//execution
 	exit = exitcode.Normal
-	if err := newRootCmd(ui, args).Execute(); err != nil {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	if err := newRootCmd(ui, args).ExecuteContext(ctx); err != nil {
 		exit = exitcode.Abnormal
 	}
 	return
 }
 
-/* Copyright 2019 Spiegel
+/* Copyright 2019-2021 Spiegel
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
