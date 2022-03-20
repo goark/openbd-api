@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/spiegel-im-spiegel/errs"
-	"github.com/spiegel-im-spiegel/fetch"
+	"github.com/goark/errs"
+	"github.com/goark/fetch"
 )
 
 const (

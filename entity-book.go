@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/spiegel-im-spiegel/errs"
+	"github.com/goark/errs"
 )
 
 //Book is entity class of book info.

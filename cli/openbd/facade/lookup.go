@@ -3,10 +3,10 @@ package facade
 import (
 	"os"
 
+	"github.com/goark/errs"
+	"github.com/goark/gocli/rwi"
+	"github.com/goark/openbd-api"
 	"github.com/spf13/cobra"
-	"github.com/spiegel-im-spiegel/errs"
-	"github.com/spiegel-im-spiegel/gocli/rwi"
-	"github.com/spiegel-im-spiegel/openbd-api"
 )
 
 //newLookupBookCmd returns cobra.Command instance for show sub-command
